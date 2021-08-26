@@ -1,0 +1,10 @@
+C:\Users\Francesco\source\repos\Lexanil\Lexanil\bin\Release\Lexanil.exe.config
+C:\Users\Francesco\source\repos\Lexanil\Lexanil\bin\Release\Lexanil.exe
+C:\Users\Francesco\source\repos\Lexanil\Lexanil\bin\Release\Lexanil.pdb
+C:\Users\Francesco\source\repos\Lexanil\Lexanil\obj\Release\Lexanil.Form1.resources
+C:\Users\Francesco\source\repos\Lexanil\Lexanil\obj\Release\Lexanil.Properties.Resources.resources
+C:\Users\Francesco\source\repos\Lexanil\Lexanil\obj\Release\Lexanil.csproj.GenerateResource.cache
+C:\Users\Francesco\source\repos\Lexanil\Lexanil\obj\Release\Lexanil.csproj.CoreCompileInputs.cache
+C:\Users\Francesco\source\repos\Lexanil\Lexanil\obj\Release\Lexanil.exe
+C:\Users\Francesco\source\repos\Lexanil\Lexanil\obj\Release\Lexanil.pdb
+C:\Users\Francesco\source\repos\Lexanil\Lexanil\obj\Release\Lexanil.csproj.AssemblyReference.cache

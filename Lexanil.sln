@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31612.314
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lexanil", "Lexanil\Lexanil.csproj", "{BFEECA25-D6D1-4193-BD6A-8C216FF75D11}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BFEECA25-D6D1-4193-BD6A-8C216FF75D11}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BFEECA25-D6D1-4193-BD6A-8C216FF75D11}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BFEECA25-D6D1-4193-BD6A-8C216FF75D11}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BFEECA25-D6D1-4193-BD6A-8C216FF75D11}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E90E37A1-60A4-49E3-8423-99CAB9022EF3}
+	EndGlobalSection
+EndGlobal
