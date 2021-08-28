@@ -51,9 +51,8 @@ namespace Lexanil
             this.ShowInTaskbar = false;
             this.Text = " ";
             this.TopMost = true;
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainWindow_Closing);
             this.Load += new System.EventHandler(this.MainWindow_Load);
-            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             this.ResumeLayout(false);
 
         }

