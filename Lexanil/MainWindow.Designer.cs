@@ -1,7 +1,7 @@
 ﻿
 namespace Lexanil
 {
-    partial class Form1
+    partial class MainWindow
     {
         /// <summary>
         /// Variabile di progettazione necessaria.
@@ -51,9 +51,8 @@ namespace Lexanil
             this.ShowInTaskbar = false;
             this.Text = " ";
             this.TopMost = true;
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
-            this.Load += new System.EventHandler(this.Form1_Load);
-            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainWindow_Closing);
+            this.Load += new System.EventHandler(this.MainWindow_Load);
             this.ResumeLayout(false);
 
         }
