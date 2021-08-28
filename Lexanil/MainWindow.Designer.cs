@@ -1,7 +1,7 @@
 ﻿
 namespace Lexanil
 {
-    partial class Form1
+    partial class MainWindow
     {
         /// <summary>
         /// Variabile di progettazione necessaria.
